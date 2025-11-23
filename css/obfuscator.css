@@ -1,0 +1,44 @@
+.wrapper {
+    display: flex;
+}
+
+main {
+    min-width: 400px;
+    max-width: 850px;
+    margin: auto;
+}
+
+main > * {
+    margin-bottom: 5em;
+}
+
+.CodeMirror {
+    border-radius: 8px;
+    border: none !important;
+}
+
+.btns-output .button, .btn-obfuscate{
+    min-width: 184px;
+    padding: var(--gap) 0 var(--gap) 0;
+}
+
+.btn-obfuscate {
+    margin: auto;
+}
+
+.btns-output {
+    display: none;
+    justify-content: space-around;
+    gap: var(--gap);
+    flex-wrap: wrap;
+}
+
+.status {
+    transition: opacity 0.4s;
+    opacity: 0;
+    text-align: center;
+}
+
+img {
+    max-width: 100%;
+}
