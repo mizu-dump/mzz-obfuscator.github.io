@@ -5,118 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MZ Obfuscator</title>
 
+<link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: #0b0e13;
-  color: #fff;
-  font-family: Orbitron, sans-serif;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.container {
-  flex: 1;
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-  text-align: center;
-}
-
-h1 {
-  font-size: 2.2em;
-  background: linear-gradient(135deg,#9fdcff,#ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.box {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 12px;
-  background: #11151d;
-}
-
-input[type=file] {
-  width: 100%;
-  padding: 14px;
-  background: #0f131b;
-  border-radius: 10px;
-  color: #aaa;
-  border: 1px dashed #444;
-}
-
-button {
-  margin-top: 15px;
-  padding: 14px;
-  width: 100%;
-  border-radius: 12px;
-  border: none;
-  font-size: 1em;
-  font-family: Orbitron;
-  cursor: pointer;
-  background: linear-gradient(135deg,#9fdcff,#ffffff);
-  color: #000;
-}
-
-#status {
-  margin-top: 15px;
-  opacity: 0.8;
-}
-
-.progress {
-  height: 10px;
-  background: #222;
-  border-radius: 20px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-.bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(135deg,#9fdcff,#ffffff);
-  transition: width 0.3s;
-}
-
-textarea {
-  width: 100%;
-  height: 240px;
-  margin-top: 20px;
-  border-radius: 12px;
-  padding: 15px;
-  background: #0f131b;
-  color: #9fdcff;
-  border: none;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.9em;
-  display: none;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-footer {
-  padding: 15px;
-  text-align: center;
-  opacity: 0.7;
-  font-size: 0.8em;
-}
-
-.icons img {
-  width: 26px;
-  margin: 8px;
-  filter: invert(1);
-}
-</style>
 </head>
 
 <body>
@@ -129,12 +19,14 @@ footer {
     <button onclick="start()">Obfuscate</button>
 
     <div id="status"></div>
-    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
 
     <textarea id="output"></textarea>
 
-    <div class="actions" id="actions" style="display:none">
-      <button onclick="copy()">COPY</button>
+    <div class="actions" id="actions">
+      <button onclick="copyText()">COPY</button>
       <button onclick="download()">DOWNLOAD</button>
     </div>
   </div>
@@ -148,93 +40,6 @@ footer {
   </div>
 </footer>
 
-<script>
-let dots = 0;
-
-function start() {
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => process(reader.result);
-  reader.readAsText(file);
-}
-
-function process(code) {
-  const status = document.getElementById("status");
-  const bar = document.getElementById("bar");
-  const out = document.getElementById("output");
-
-  status.textContent = "Obfuscating";
-  bar.style.width = "0%";
-  out.style.display = "none";
-  document.getElementById("actions").style.display = "none";
-
-  let p = 0;
-  const interval = setInterval(() => {
-    dots = (dots + 1) % 4;
-    status.textContent = "Obfuscating" + ".".repeat(dots);
-    p += Math.random() * 15;
-    bar.style.width = Math.min(p,100) + "%";
-
-    if (p >= 100) {
-      clearInterval(interval);
-      out.value = obfuscate(code);
-      out.style.display = "block";
-      document.getElementById("actions").style.display = "flex";
-      status.textContent = "Completed";
-    }
-  }, 250);
-}
-
-function obfuscate(lua) {
-  const chars = [...lua].map(c => c.charCodeAt(0));
-  const checksum = chars.reduce((a,b,i)=> (a + b*(i+1))%1000000007,0);
-
-  return `
---([[This File Was Protected By MZ Obfuscator v0.0.2 • dsc.gg/mzzhub]])
-
-local _d={${chars.join(",")}}
-local _h=${checksum}
-
-local function _c(t)
-  local r=0
-  for i=1,#t do
-    r=(r+t[i]*i)%1000000007
-  end
-  return r
-end
-
-if not game or not typeof or typeof(game)~="Instance" then return end
-if _c(_d)~=_h then return end
-
-local function _r()
-  local s=""
-  for i=1,#_d do
-    s=s..string.char(_d[i])
-  end
-  return s
-end
-
-pcall(function()
-  local f=load(_r())
-  if f then f() end
-end)
-`;
-}
-
-function copy() {
-  navigator.clipboard.writeText(output.value);
-}
-
-function download() {
-  const blob = new Blob([output.value], {type:"text/plain"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "obfuscated.lua";
-  a.click();
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
