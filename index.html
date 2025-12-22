@@ -5,8 +5,111 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MZ Obfuscator</title>
 
-<link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#0b0e13;
+  color:white;
+  font-family:Orbitron,sans-serif;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+.container{
+  flex:1;
+  padding:20px;
+  max-width:900px;
+  margin:auto;
+  text-align:center;
+}
+h1{
+  font-size:2.2em;
+  background:linear-gradient(135deg,#9fdcff,#fff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.box{
+  background:#11151d;
+  padding:20px;
+  border-radius:14px;
+  margin-top:20px;
+}
+input[type=file]{
+  width:100%;
+  padding:14px;
+  background:#0f131b;
+  border-radius:10px;
+  border:1px dashed #444;
+  color:#aaa;
+}
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-family:Orbitron;
+  background:linear-gradient(135deg,#9fdcff,#fff);
+  color:black;
+}
+#status{margin-top:10px;opacity:.8}
+.progress{
+  height:10px;
+  background:#222;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(135deg,#9fdcff,#fff);
+  transition:width .3s;
+}
+textarea{
+  display:none;
+  width:100%;
+  height:260px;
+  margin-top:20px;
+  background:#0f131b;
+  color:#9fdcff;
+  border-radius:12px;
+  border:none;
+  padding:15px;
+  font-family:"JetBrains Mono",monospace;
+  font-size:.9em;
+}
+.actions{
+  display:none;
+  gap:10px;
+  margin-top:10px;
+}
+footer{
+  text-align:center;
+  padding:15px;
+  opacity:.7;
+  font-size:.8em;
+}
+.icon{
+  width:26px;
+  height:26px;
+  display:inline-block;
+  background:white;
+  margin:6px;
+}
+.discord{
+  mask:url("https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/discord.svg") no-repeat center;
+  -webkit-mask:url("https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/discord.svg") no-repeat center;
+}
+.github{
+  mask:url("https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg") no-repeat center;
+  -webkit-mask:url("https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg") no-repeat center;
+}
+</style>
 </head>
 
 <body>
@@ -15,13 +118,11 @@
   <h1>MZ Obfuscator</h1>
 
   <div class="box">
-    <input type="file" id="fileInput" accept=".lua,.txt">
-    <button id="obfBtn">Obfuscate</button>
+    <input id="fileInput" type="file" accept=".lua,.txt">
+    <button onclick="start()">Obfuscate</button>
 
     <div id="status"></div>
-    <div class="progress">
-      <div class="bar" id="bar"></div>
-    </div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
 
     <textarea id="output" readonly></textarea>
 
@@ -33,20 +134,114 @@
 </div>
 
 <footer>
-  <div class="footer-text">
-    MZZ COMMUNITY<br>© 2025‑2024
-  </div>
-
-  <div class="icons">
-    <a href="https://discord.gg/mzzhub" target="_blank">
-      <span class="icon discord"></span>
-    </a>
-    <a href="https://github.com/" target="_blank">
-      <span class="icon github"></span>
-    </a>
+  <div>MZZ COMMUNITY<br>© 2025‑2024</div>
+  <div>
+    <span class="icon discord"></span>
+    <span class="icon github"></span>
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script>
+let dots=0;
+
+function start(){
+  const input=document.getElementById("fileInput");
+  const file=input.files && input.files[0];
+
+  if(!file){
+    alert("Please choose a .lua or .txt file");
+    return;
+  }
+
+  const reader=new FileReader();
+  reader.onerror=()=>alert("Failed to read file");
+
+  reader.onload=()=>{
+    const text=reader.result;
+    if(!text || text.trim().length===0){
+      alert("File is empty");
+      return;
+    }
+    process(text);
+  };
+
+  reader.readAsText(file);
+}
+
+function process(code){
+  const status=document.getElementById("status");
+  const bar=document.getElementById("bar");
+  const out=document.getElementById("output");
+  const actions=document.getElementById("actions");
+
+  out.style.display="none";
+  actions.style.display="none";
+  bar.style.width="0%";
+
+  let p=0;
+  const i=setInterval(()=>{
+    dots=(dots+1)%4;
+    status.textContent="Obfuscating"+".".repeat(dots);
+    p+=Math.random()*20;
+    bar.style.width=Math.min(p,100)+"%";
+
+    if(p>=100){
+      clearInterval(i);
+      out.value=obfuscate(code);
+      out.style.display="block";
+      actions.style.display="flex";
+      status.textContent="Completed";
+    }
+  },200);
+}
+
+function obfuscate(lua){
+  const arr=[...lua].map(c=>c.charCodeAt(0));
+  const chk=arr.reduce((a,b,i)=>(a+b*(i+1))%1000000007,0);
+
+return `
+--([[This File Was Protected By MZ Obfuscator v0.0.2 • dsc.gg/mzzhub]])
+
+local _d={${arr.join(",")}}
+local _h=${chk}
+
+local function _v(t)
+  local r=0
+  for i=1,#t do
+    r=(r+t[i]*i)%1000000007
+  end
+  return r
+end
+
+if not game or not typeof or typeof(game)~="Instance" then return end
+if _v(_d)~=_h then return end
+
+local function _r()
+  local s=""
+  for i=1,#_d do
+    s=s..string.char(_d[i])
+  end
+  local f=load(s)
+  if f then f() end
+end
+
+pcall(_r)
+`;
+}
+
+function copyText(){
+  navigator.clipboard.writeText(document.getElementById("output").value);
+}
+
+function download(){
+  const t=document.getElementById("output").value;
+  const b=new Blob([t],{type:"text/plain"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="obfuscated.lua";
+  a.click();
+}
+</script>
+
 </body>
 </html>
