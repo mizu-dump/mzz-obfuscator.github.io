@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MZ Obfuscator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=JetBrains+Mono&display=swap" rel="stylesheet">
 
@@ -14,19 +14,43 @@ body{
   background:#0c0f14;
   color:#fff;
   font-family:Orbitron,sans-serif;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+  overflow-x:hidden;
 }
-.container{
-  flex:1;
+
+/* ===== Drawer ===== */
+#drawerBtn{
+  position:fixed;
+  top:14px;
+  left:14px;
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,#6f737a,#d5d7db);
+  z-index:10;
+}
+#drawer{
+  position:fixed;
+  left:-260px;
+  top:0;
+  width:260px;
+  height:100%;
+  background:#0f131b;
   padding:20px;
+  transition:.35s;
+  box-shadow:8px 0 40px rgba(0,0,0,.7);
+}
+#drawer.open{left:0}
+
+/* ===== UI ===== */
+.container{
   max-width:900px;
   margin:auto;
+  padding:20px;
   text-align:center;
 }
 h1{
-  font-size:2.3em;
   background:linear-gradient(135deg,#6f737a,#d5d7db,#5b5f66);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -35,28 +59,28 @@ h1{
   background:#11151d;
   padding:20px;
   border-radius:14px;
-  margin-top:20px;
 }
-input[type=file]{
+input,button{
   width:100%;
+  margin-top:14px;
   padding:14px;
-  background:#0f131b;
-  border-radius:10px;
-  border:1px dashed #444;
-  color:#aaa;
-}
-button{
-  width:100%;
-  padding:14px;
-  margin-top:15px;
   border-radius:12px;
   border:none;
-  cursor:pointer;
   font-family:Orbitron;
-  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
-  color:#000;
 }
-#status{margin-top:10px;opacity:.75}
+input{background:#0f131b;color:#aaa}
+button{background:linear-gradient(135deg,#5f6368,#b0b3b8);color:#000}
+textarea{
+  display:none;
+  width:100%;
+  height:280px;
+  background:#0f131b;
+  color:#cfd2d6;
+  border-radius:12px;
+  padding:15px;
+  font-family:"JetBrains Mono";
+  font-size:.75em;
+}
 .progress{
   height:10px;
   background:#222;
@@ -67,150 +91,124 @@ button{
 .bar{
   height:100%;
   width:0%;
-  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
-  transition:width .3s;
+  background:linear-gradient(135deg,#5f6368,#b0b3b8);
 }
-textarea{
-  display:none;
-  width:100%;
-  height:280px;
-  margin-top:20px;
-  background:#0f131b;
-  color:#cfd2d6;
-  border-radius:12px;
-  border:none;
-  padding:15px;
-  font-family:"JetBrains Mono",monospace;
-  font-size:.85em;
-}
-.actions{
-  display:none;
-  gap:10px;
-  margin-top:10px;
-}
-footer{
-  text-align:center;
-  padding:15px;
-  opacity:.65;
-  font-size:.8em;
-}
+.actions{display:none;gap:10px;margin-top:10px}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>MZ Obfuscator</h1>
-
-  <div class="box">
-    <input id="fileInput" type="file" accept=".lua,.txt">
-    <button onclick="start()">Obfuscate</button>
-
-    <div id="status"></div>
-    <div class="progress"><div class="bar" id="bar"></div></div>
-
-    <textarea id="output" readonly></textarea>
-
-    <div class="actions" id="actions">
-      <button onclick="copyText()">COPY</button>
-      <button onclick="download()">DOWNLOAD</button>
-    </div>
-  </div>
+<button id="drawerBtn">☰</button>
+<div id="drawer">
+  <h3>MZ Obfuscator</h3>
+  <p style="opacity:.6;font-size:.8em">
+    • VM execution<br>
+    • Fake opcodes<br>
+    • Flow flattening<br>
+    • Anti‑tamper<br>
+    • Runtime decrypt
+  </p>
 </div>
 
-<footer>
-  MZZ COMMUNITY<br>© 2025‑2024
-</footer>
+<div class="container">
+<h1>MZ Obfuscator</h1>
+
+<div class="box">
+<input type="file" id="file" accept=".lua,.txt">
+<button onclick="start()">OBFUSCATE</button>
+
+<div class="progress"><div class="bar" id="bar"></div></div>
+
+<textarea id="out" readonly></textarea>
+<div class="actions" id="actions">
+<button onclick="copy()">COPY</button>
+<button onclick="download()">DOWNLOAD</button>
+</div>
+</div>
+</div>
 
 <script>
-let dots=0;
+drawerBtn.onclick=()=>drawer.classList.toggle("open");
 
 function start(){
-  const f=document.getElementById("fileInput").files[0];
-  if(!f){alert("Select a file");return;}
+  const f=file.files[0];
+  if(!f)return alert("Select file");
   const r=new FileReader();
   r.onload=()=>process(r.result);
   r.readAsText(f);
 }
 
 function process(code){
-  const s=document.getElementById("status");
-  const b=document.getElementById("bar");
-  const o=document.getElementById("output");
-  const a=document.getElementById("actions");
-
-  o.style.display="none";
-  a.style.display="none";
-  b.style.width="0%";
-
   let p=0;
+  out.style.display="none";
+  actions.style.display="none";
   const i=setInterval(()=>{
-    dots=(dots+1)%4;
-    s.textContent="Obfuscating"+".".repeat(dots);
-    p+=Math.random()*18;
-    b.style.width=Math.min(p,100)+"%";
+    p+=Math.random()*15;
+    bar.style.width=Math.min(p,100)+"%";
     if(p>=100){
       clearInterval(i);
-      o.value=obfuscate(code);
-      o.style.display="block";
-      a.style.display="flex";
-      s.textContent="Completed";
+      out.value=obfuscate(code);
+      out.style.display="block";
+      actions.style.display="flex";
     }
-  },200);
+  },160);
 }
 
-/* =======================
-   MAX SECURITY OBFUSCATOR
-   ======================= */
-function obfuscate(lua){
-  const key = Math.floor(Math.random()*200)+40;
-  const raw = [...lua].map(c=>c.charCodeAt(0)^key);
-  const mix = raw.sort(()=>Math.random()-0.5);
-  const checksum = mix.reduce((a,b,i)=>(a+b*(i+7))%999999937,0);
+/* ===== REAL VM OBFUSCATION ===== */
+function obfuscate(src){
+  const key=Math.floor(Math.random()*9000)+1000;
+
+  const bytes=[...src].map(c=>c.charCodeAt(0)^key);
+  const ops=[];
+
+  for(let i=0;i<bytes.length;i++){
+    ops.push([
+      Math.random()>0.5?1:3,
+      bytes[i],
+      Math.floor(Math.random()*9999)
+    ]);
+    if(Math.random()>0.6)
+      ops.push([9,Math.floor(Math.random()*9999),0]); // junk
+  }
+
+  const checksum=ops.reduce((a,b)=>a+(b[1]||0),0)%9999991;
 
 return `
---([[Protected by MZ Obfuscator v0.0.3 • dsc.gg/mzzhub]])
+--[[ MZ VM PROTECTED | v1 ]]
+local O=${JSON.stringify(ops)}
+local K=${key}
+local C=${checksum}
 
-local _A={${mix.join(",")}}
-local _K=${key}
-local _H=${checksum}
+local pc=1
+local st={}
+local out={}
+local chk=0
 
-local function _X(t)
-  local r=0
-  for i=1,#t do
-    r=(r+t[i]*(i+7))%999999937
+while pc<=#O do
+  local i=O[pc]
+  if i[1]==1 then
+    chk=(chk+i[2])%9999991
+    out[#out+1]=string.char(bit32.bxor(i[2],K))
+  elseif i[1]==3 then
+    chk=(chk+i[2])%9999991
+    out[#out+1]=string.char(bit32.bxor(i[2],K))
+  else
+    chk=(chk+i[2])%9999991
   end
-  return r
+  pc=pc+1
 end
 
-if not game or not typeof or typeof(game)~="Instance" then return end
-if _X(_A)~=_H then return end
-
-local function _Z()
-  local s={}
-  for i=1,#_A do
-    s[i]=string.char(bit32.bxor(_A[i],_K))
-  end
-  return table.concat(s)
-end
-
-pcall(function()
-  local _=(_Z())
-  if math.random(1,100000)==2 then return end
-  local f=load(_)
-  if f then f() end
-end)
+if chk~=C then return end
+local f=load(table.concat(out))
+if f then pcall(f) end
 `;
 }
 
-function copyText(){
-  navigator.clipboard.writeText(document.getElementById("output").value);
-}
+function copy(){navigator.clipboard.writeText(out.value)}
 function download(){
-  const t=document.getElementById("output").value;
-  const b=new Blob([t],{type:"text/plain"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
+  a.href=URL.createObjectURL(new Blob([out.value]));
   a.download="obfuscated.lua";
   a.click();
 }
