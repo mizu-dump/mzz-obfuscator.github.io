@@ -16,14 +16,14 @@
 
   <div class="box">
     <input type="file" id="fileInput" accept=".lua,.txt">
-    <button onclick="start()">Obfuscate</button>
+    <button id="obfBtn">Obfuscate</button>
 
     <div id="status"></div>
     <div class="progress">
       <div class="bar" id="bar"></div>
     </div>
 
-    <textarea id="output"></textarea>
+    <textarea id="output" readonly></textarea>
 
     <div class="actions" id="actions">
       <button onclick="copyText()">COPY</button>
@@ -33,10 +33,17 @@
 </div>
 
 <footer>
-  <div>MZZ COMMUNITY<br>© 2025‑2024</div>
+  <div class="footer-text">
+    MZZ COMMUNITY<br>© 2025‑2024
+  </div>
+
   <div class="icons">
-    <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/733/733609.png">
+    <a href="https://discord.gg/mzzhub" target="_blank">
+      <span class="icon discord"></span>
+    </a>
+    <a href="https://github.com/" target="_blank">
+      <span class="icon github"></span>
+    </a>
   </div>
 </footer>
 
