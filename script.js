@@ -1,11 +1,28 @@
 let dots = 0;
+document.getElementById("obfBtn").onclick = start;
 
 function start() {
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return;
+  const input = document.getElementById("fileInput");
+  const file = input.files && input.files[0];
+
+  if (!file) {
+    alert("Please select a .lua or .txt file");
+    return;
+  }
 
   const reader = new FileReader();
-  reader.onload = () => process(reader.result);
+
+  reader.onerror = () => alert("Failed to read file");
+
+  reader.onload = () => {
+    const content = reader.result;
+    if (!content || content.trim().length === 0) {
+      alert("File is empty or unsupported");
+      return;
+    }
+    process(content);
+  };
+
   reader.readAsText(file);
 }
 
@@ -23,8 +40,8 @@ function process(code) {
   const interval = setInterval(() => {
     dots = (dots + 1) % 4;
     status.textContent = "Obfuscating" + ".".repeat(dots);
-    p += Math.random() * 15;
-    bar.style.width = Math.min(p,100) + "%";
+    p += Math.random() * 18;
+    bar.style.width = Math.min(p, 100) + "%";
 
     if (p >= 100) {
       clearInterval(interval);
@@ -33,12 +50,12 @@ function process(code) {
       actions.style.display = "flex";
       status.textContent = "Completed";
     }
-  }, 250);
+  }, 220);
 }
 
 function obfuscate(lua) {
   const chars = [...lua].map(c => c.charCodeAt(0));
-  const checksum = chars.reduce((a,b,i)=> (a + b*(i+1))%1000000007,0);
+  const checksum = chars.reduce((a,b,i)=> (a + b*(i+1)) % 1000000007, 0);
 
   return `
 --([[This File Was Protected By MZ Obfuscator v0.0.2 • dsc.gg/mzzhub]])
@@ -46,7 +63,7 @@ function obfuscate(lua) {
 local _d={${chars.join(",")}}
 local _h=${checksum}
 
-local function _c(t)
+local function _chk(t)
   local r=0
   for i=1,#t do
     r=(r+t[i]*i)%1000000007
@@ -55,20 +72,18 @@ local function _c(t)
 end
 
 if not game or not typeof or typeof(game)~="Instance" then return end
-if _c(_d)~=_h then return end
+if _chk(_d)~=_h then return end
 
-local function _r()
+local function _run()
   local s=""
   for i=1,#_d do
     s=s..string.char(_d[i])
   end
-  return s
+  local f=load(s)
+  if f then f() end
 end
 
-pcall(function()
-  local f=load(_r())
-  if f then f() end
-end)
+pcall(_run)
 `;
 }
 
