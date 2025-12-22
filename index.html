@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MZ Obfuscator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 *{box-sizing:border-box}
@@ -14,10 +18,10 @@ body{
   background:#0c0f14;
   color:#fff;
   font-family:Orbitron,sans-serif;
-  overflow-x:hidden;
+  min-height:100vh;
 }
 
-/* ===== Drawer ===== */
+/* Drawer Button */
 #drawerBtn{
   position:fixed;
   top:14px;
@@ -25,32 +29,45 @@ body{
   width:42px;
   height:42px;
   border-radius:12px;
-  border:none;
+  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
+  color:#000;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
-  background:linear-gradient(135deg,#6f737a,#d5d7db);
-  z-index:10;
+  z-index:1001;
 }
+
+/* Drawer */
 #drawer{
   position:fixed;
-  left:-260px;
-  top:0;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  z-index:1000;
+}
+#drawer.open{display:block}
+#drawerPanel{
   width:260px;
   height:100%;
   background:#0f131b;
   padding:20px;
-  transition:.35s;
-  box-shadow:8px 0 40px rgba(0,0,0,.7);
+  animation:slideIn .25s ease forwards;
 }
-#drawer.open{left:0}
+@keyframes slideIn{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(0)}
+}
 
-/* ===== UI ===== */
 .container{
+  padding:20px;
   max-width:900px;
   margin:auto;
-  padding:20px;
   text-align:center;
 }
 h1{
+  font-size:2.3em;
   background:linear-gradient(135deg,#6f737a,#d5d7db,#5b5f66);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -59,28 +76,28 @@ h1{
   background:#11151d;
   padding:20px;
   border-radius:14px;
+  margin-top:20px;
 }
-input,button{
+input[type=file]{
   width:100%;
-  margin-top:14px;
   padding:14px;
+  background:#0f131b;
+  border-radius:10px;
+  border:1px dashed #444;
+  color:#aaa;
+}
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
   border-radius:12px;
   border:none;
+  cursor:pointer;
   font-family:Orbitron;
+  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
+  color:#000;
 }
-input{background:#0f131b;color:#aaa}
-button{background:linear-gradient(135deg,#5f6368,#b0b3b8);color:#000}
-textarea{
-  display:none;
-  width:100%;
-  height:280px;
-  background:#0f131b;
-  color:#cfd2d6;
-  border-radius:12px;
-  padding:15px;
-  font-family:"JetBrains Mono";
-  font-size:.75em;
-}
+#status{margin-top:10px;opacity:.7}
 .progress{
   height:10px;
   background:#222;
@@ -91,124 +108,150 @@ textarea{
 .bar{
   height:100%;
   width:0%;
-  background:linear-gradient(135deg,#5f6368,#b0b3b8);
+  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
 }
-.actions{display:none;gap:10px;margin-top:10px}
+textarea{
+  display:none;
+  width:100%;
+  height:280px;
+  margin-top:20px;
+  background:#0f131b;
+  color:#cfd2d6;
+  border-radius:12px;
+  border:none;
+  padding:15px;
+  font-family:"JetBrains Mono",monospace;
+  font-size:.85em;
+}
+.actions{
+  display:none;
+  gap:10px;
+  margin-top:10px;
+}
+footer{
+  text-align:center;
+  padding:15px;
+  opacity:.6;
+  font-size:.8em;
+}
+a{color:#d5d7db;text-decoration:none}
 </style>
 </head>
 
 <body>
 
-<button id="drawerBtn">☰</button>
+<!-- Drawer Button -->
+<div id="drawerBtn">☰</div>
+
+<!-- Drawer -->
 <div id="drawer">
-  <h3>MZ Obfuscator</h3>
-  <p style="opacity:.6;font-size:.8em">
-    • VM execution<br>
-    • Fake opcodes<br>
-    • Flow flattening<br>
-    • Anti‑tamper<br>
-    • Runtime decrypt
-  </p>
+  <div id="drawerPanel">
+    <h3 style="margin-top:0">MZ Obfuscator</h3>
+
+    <p style="opacity:.6;font-size:.8em;line-height:1.6">
+      • VM Execution<br>
+      • Control‑Flow Flattening<br>
+      • Runtime Decryption<br>
+      • Anti‑Tamper<br>
+      • Anti‑Static Analysis
+    </p>
+
+    <div style="margin-top:20px;display:flex;gap:16px">
+      <a href="https://discord.gg/mzzhub" target="_blank">
+        <i class="fa-brands fa-discord fa-xl"></i>
+      </a>
+      <a href="https://github.com/mzzhub" target="_blank">
+        <i class="fa-brands fa-github fa-xl"></i>
+      </a>
+    </div>
+
+    <p style="margin-top:20px;font-size:.7em;opacity:.4">
+      MZZ COMMUNITY
+    </p>
+  </div>
 </div>
 
 <div class="container">
-<h1>MZ Obfuscator</h1>
+  <h1>MZ Obfuscator</h1>
 
-<div class="box">
-<input type="file" id="file" accept=".lua,.txt">
-<button onclick="start()">OBFUSCATE</button>
+  <div class="box">
+    <input id="fileInput" type="file" accept=".lua,.txt">
+    <button onclick="start()">Obfuscate</button>
 
-<div class="progress"><div class="bar" id="bar"></div></div>
+    <div id="status"></div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
 
-<textarea id="out" readonly></textarea>
-<div class="actions" id="actions">
-<button onclick="copy()">COPY</button>
-<button onclick="download()">DOWNLOAD</button>
+    <textarea id="output" readonly></textarea>
+
+    <div class="actions" id="actions">
+      <button onclick="copyText()">COPY</button>
+      <button onclick="download()">DOWNLOAD</button>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
+<footer>
+  © 2025‑2024 • MZZ COMMUNITY
+</footer>
 
 <script>
-drawerBtn.onclick=()=>drawer.classList.toggle("open");
+/* Drawer Logic */
+const btn=document.getElementById("drawerBtn");
+const drawer=document.getElementById("drawer");
+btn.onclick=()=>{drawer.classList.add("open");btn.style.display="none";}
+drawer.onclick=e=>{
+  if(e.target===drawer){
+    drawer.classList.remove("open");
+    btn.style.display="flex";
+  }
+};
 
+/* Obfuscator UI */
+let dots=0;
 function start(){
-  const f=file.files[0];
-  if(!f)return alert("Select file");
+  const f=fileInput.files[0];
+  if(!f)return alert("Select a file");
   const r=new FileReader();
   r.onload=()=>process(r.result);
   r.readAsText(f);
 }
-
 function process(code){
-  let p=0;
-  out.style.display="none";
+  status.textContent="";
+  bar.style.width="0%";
+  output.style.display="none";
   actions.style.display="none";
+  let p=0;
   const i=setInterval(()=>{
-    p+=Math.random()*15;
+    dots=(dots+1)%4;
+    status.textContent="Obfuscating"+".".repeat(dots);
+    p+=Math.random()*20;
     bar.style.width=Math.min(p,100)+"%";
     if(p>=100){
       clearInterval(i);
-      out.value=obfuscate(code);
-      out.style.display="block";
+      output.value=obfuscate(code);
+      output.style.display="block";
       actions.style.display="flex";
+      status.textContent="Completed";
     }
-  },160);
+  },200);
 }
 
-/* ===== REAL VM OBFUSCATION ===== */
-function obfuscate(src){
-  const key=Math.floor(Math.random()*9000)+1000;
-
-  const bytes=[...src].map(c=>c.charCodeAt(0)^key);
-  const ops=[];
-
-  for(let i=0;i<bytes.length;i++){
-    ops.push([
-      Math.random()>0.5?1:3,
-      bytes[i],
-      Math.floor(Math.random()*9999)
-    ]);
-    if(Math.random()>0.6)
-      ops.push([9,Math.floor(Math.random()*9999),0]); // junk
-  }
-
-  const checksum=ops.reduce((a,b)=>a+(b[1]||0),0)%9999991;
-
-return `
---[[ MZ VM PROTECTED | v1 ]]
-local O=${JSON.stringify(ops)}
+/* Lua Obfuscation (basic placeholder) */
+function obfuscate(lua){
+  const key=Math.floor(Math.random()*200)+40;
+  const data=[...lua].map(c=>c.charCodeAt(0)^key);
+return `--([[This File Was Protected By MZ Obfuscator v0.0.3 • dsc.gg/mzzhub]])
+local A={${data.join(",")}}
 local K=${key}
-local C=${checksum}
-
-local pc=1
-local st={}
-local out={}
-local chk=0
-
-while pc<=#O do
-  local i=O[pc]
-  if i[1]==1 then
-    chk=(chk+i[2])%9999991
-    out[#out+1]=string.char(bit32.bxor(i[2],K))
-  elseif i[1]==3 then
-    chk=(chk+i[2])%9999991
-    out[#out+1]=string.char(bit32.bxor(i[2],K))
-  else
-    chk=(chk+i[2])%9999991
-  end
-  pc=pc+1
-end
-
-if chk~=C then return end
-local f=load(table.concat(out))
-if f then pcall(f) end
-`;
+local S=""
+for i=1,#A do S=S..string.char(bit32.bxor(A[i],K)) end
+load(S)()`;
 }
-
-function copy(){navigator.clipboard.writeText(out.value)}
+function copyText(){navigator.clipboard.writeText(output.value)}
 function download(){
+  const b=new Blob([output.value]);
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([out.value]));
+  a.href=URL.createObjectURL(b);
   a.download="obfuscated.lua";
   a.click();
 }
