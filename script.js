@@ -1,94 +1,84 @@
-const tips = [
-  "Did you know this obfuscator avoids loadstring?",
-  "Did you know obfuscation slows reverse engineering?",
-  "Did you know tables make static analysis harder?",
-  "Did you know this uses string reconstruction?",
-  "Did you know multiple layers increase security?"
-];
+let dots = 0;
 
-const obfBtn = document.getElementById("obfBtn");
-const process = document.getElementById("process");
-const result = document.getElementById("result");
-const progress = document.getElementById("progress");
-const percent = document.getElementById("percent");
-const dots = document.getElementById("dots");
-const tip = document.getElementById("tip");
-const output = document.getElementById("output");
-
-let dotCount = 1;
-
-setInterval(() => {
-  dotCount = (dotCount % 3) + 1;
-  dots.textContent = ".".repeat(dotCount);
-}, 500);
-
-obfBtn.onclick = () => {
+function start() {
   const file = document.getElementById("fileInput").files[0];
-  if (!file) return alert("Choose a .lua file");
+  if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = () => startObfuscation(reader.result);
+  reader.onload = () => process(reader.result);
   reader.readAsText(file);
-};
+}
 
-function startObfuscation(code) {
-  process.classList.remove("hidden");
-  tip.textContent = tips[Math.floor(Math.random() * tips.length)];
+function process(code) {
+  const status = document.getElementById("status");
+  const bar = document.getElementById("bar");
+  const out = document.getElementById("output");
+  const actions = document.getElementById("actions");
+
+  out.style.display = "none";
+  actions.style.display = "none";
+  bar.style.width = "0%";
 
   let p = 0;
-  const timer = setInterval(() => {
-    p += Math.random() * 12;
+  const interval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    status.textContent = "Obfuscating" + ".".repeat(dots);
+    p += Math.random() * 15;
+    bar.style.width = Math.min(p,100) + "%";
+
     if (p >= 100) {
-      p = 100;
-      clearInterval(timer);
-      finish(code);
+      clearInterval(interval);
+      out.value = obfuscate(code);
+      out.style.display = "block";
+      actions.style.display = "flex";
+      status.textContent = "Completed";
     }
-    progress.style.width = p + "%";
-    percent.textContent = Math.floor(p);
-  }, 300);
+  }, 250);
 }
 
-function finish(code) {
-  const obf = obfuscateLua(code);
-  output.value = obf;
-  process.classList.add("hidden");
-  result.classList.remove("hidden");
-}
-
-function obfuscateLua(lua) {
+function obfuscate(lua) {
   const chars = [...lua].map(c => c.charCodeAt(0));
-  return `
-local _m = {}
-_m.d = {${chars.join(",")}}
+  const checksum = chars.reduce((a,b,i)=> (a + b*(i+1))%1000000007,0);
 
-local function _r(t)
-  local s = ""
+  return `
+--([[This File Was Protected By MZ Obfuscator v0.0.2 • dsc.gg/mzzhub]])
+
+local _d={${chars.join(",")}}
+local _h=${checksum}
+
+local function _c(t)
+  local r=0
   for i=1,#t do
-    s = s .. string.char(t[i])
+    r=(r+t[i]*i)%1000000007
+  end
+  return r
+end
+
+if not game or not typeof or typeof(game)~="Instance" then return end
+if _c(_d)~=_h then return end
+
+local function _r()
+  local s=""
+  for i=1,#_d do
+    s=s..string.char(_d[i])
   end
   return s
 end
 
-local function _e()
-  local f = _r(_m.d)
-  local ok,err = pcall(function()
-    local g = getfenv(0)
-    g["print"] = print
-    assert(load ~= nil)
-    load(f)()
-  end)
-end
-
-_e()
+pcall(function()
+  local f=load(_r())
+  if f then f() end
+end)
 `;
 }
 
-function copyCode() {
-  navigator.clipboard.writeText(output.value);
+function copyText() {
+  navigator.clipboard.writeText(document.getElementById("output").value);
 }
 
-function downloadCode() {
-  const blob = new Blob([output.value], {type:"text/plain"});
+function download() {
+  const text = document.getElementById("output").value;
+  const blob = new Blob([text], {type:"text/plain"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "obfuscated.lua";
