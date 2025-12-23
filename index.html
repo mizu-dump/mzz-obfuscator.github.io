@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MZ Obfuscator</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -12,157 +13,366 @@
 body{
   margin:0;
   background:#0c0f14;
-  color:#fff;
+  color:#cfd2d6;
   font-family:Orbitron,sans-serif;
+  min-height:100vh;
 }
+
+/* Drawer Button */
 #drawerBtn{
   position:fixed;
-  top:14px;left:14px;
-  width:42px;height:42px;
+  top:14px;
+  left:14px;
+  width:42px;
+  height:42px;
   border-radius:12px;
   background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:1001;
+  color:#000;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:1001;
 }
-#drawer{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:1000}
+
+/* Drawer */
+#drawer{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  z-index:1000;
+}
 #drawer.open{display:block}
 #drawerPanel{
-  width:260px;height:100%;
-  background:#0f131b;padding:20px;
-  animation:slide .25s ease forwards;
+  width:260px;
+  height:100%;
+  background:#0f131b;
+  padding:20px;
+  animation:slideIn .25s ease forwards;
 }
-@keyframes slide{from{transform:translateX(-100%)}to{transform:none}}
+@keyframes slideIn{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(0)}
+}
 
-.container{max-width:900px;margin:auto;padding:20px;text-align:center}
-.box{background:#11151d;padding:20px;border-radius:14px;margin-top:20px}
-button,input{width:100%;padding:14px;border-radius:12px;border:none}
-button{cursor:pointer;background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52)}
-textarea{display:none;margin-top:20px;height:280px;background:#0f131b;color:#cfd2d6;border-radius:12px;padding:15px;font-family:JetBrains Mono}
-.actions{display:none;gap:10px;margin-top:10px}
-label{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:.85em}
-.progress{height:10px;background:#222;border-radius:20px;overflow:hidden;margin-top:10px}
-.bar{height:100%;width:0%;background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52)}
-footer{opacity:.5;font-size:.8em;text-align:center;margin:15px}
+/* Main */
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+  text-align:center;
+}
+h1{
+  font-size:2.3em;
+  background:linear-gradient(135deg,#6f737a,#d5d7db,#5b5f66);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.box{
+  background:#11151d;
+  padding:20px;
+  border-radius:14px;
+  margin-top:20px;
+}
+
+/* File input */
+input[type=file]{
+  width:100%;
+  padding:14px;
+  background:#0f131b;
+  border-radius:10px;
+  border:1px dashed #444;
+  color:#aaa;
+}
+
+/* Buttons */
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
+  font-family:Orbitron;
+  color:#000;
+  cursor:pointer;
+}
+
+/* Progress */
+.progress{
+  height:10px;
+  background:#222;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
+  transition:width .35s ease;
+}
+
+/* Output */
+textarea{
+  display:none;
+  width:100%;
+  height:280px;
+  margin-top:20px;
+  background:#0f131b;
+  color:#cfd2d6;
+  border-radius:12px;
+  border:none;
+  padding:15px;
+  font-family:"JetBrains Mono",monospace;
+  font-size:.85em;
+}
+
+/* Actions */
+.actions{
+  display:none;
+  gap:10px;
+  margin-top:10px;
+}
+
+/* Options */
+.options{
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  margin-top:10px;
+  font-size:.8em;
+  opacity:.85;
+}
+label{cursor:pointer}
+
+/* Checkbox steel color */
+input[type=checkbox]{
+  accent-color:#b0b3b8;
+}
+
+/* Slider */
+.sizeSlider{
+  margin-top:10px;
+  text-align:left;
+  font-size:.8em;
+  opacity:.85;
+}
+input[type=range]{
+  -webkit-appearance:none;
+  width:100%;
+  height:6px;
+  border-radius:4px;
+  background:linear-gradient(135deg,#5f6368,#b0b3b8,#4a4d52);
+  outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#cfd2d6;
+  cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#cfd2d6;
+  cursor:pointer;
+}
+
+/* Drawer icons white */
+a i.fa-brands{
+  color:#fff;
+}
+
+/* Footer */
+footer{
+  text-align:center;
+  padding:15px;
+  opacity:.6;
+  font-size:.8em;
+}
 </style>
 </head>
 
 <body>
 
+<!-- Drawer Button -->
 <div id="drawerBtn">☰</div>
 
+<!-- Drawer -->
 <div id="drawer">
   <div id="drawerPanel">
-    <h3>MZ Obfuscator</h3>
-    <p style="font-size:.8em;opacity:.6;line-height:1.6">
+    <h3 style="margin-top:0">MZ Obfuscator</h3>
+    <p style="opacity:.6;font-size:.8em;line-height:1.6">
       • VM Execution<br>
-      • Anti-Tamper Loader<br>
-      • Constant Encryption<br>
-      • Control-Flow Flattening
+      • Control‑Flow Flattening<br>
+      • Runtime Decryption<br>
+      • Anti‑Tamper VM<br>
+      • Anti‑Static Analysis
     </p>
-    <div style="display:flex;gap:16px;margin-top:20px">
-      <a href="https://discord.gg/mzzhub" target="_blank"><i class="fa-brands fa-discord fa-xl"></i></a>
-      <a href="https://github.com/mzzhub" target="_blank"><i class="fa-brands fa-github fa-xl"></i></a>
+
+    <div style="margin-top:20px;display:flex;gap:16px">
+      <a href="https://dsc.gg/mzzhub" target="_blank">
+        <i class="fa-brands fa-discord fa-xl"></i>
+      </a>
+      <a href="https://github.com/mizu-dump" target="_blank">
+        <i class="fa-brands fa-github fa-xl"></i>
+      </a>
     </div>
+
+    <p style="margin-top:20px;font-size:.7em;opacity:.4">MZZ COMMUNITY</p>
   </div>
 </div>
 
 <div class="container">
-<h1>MZ Obfuscator</h1>
+  <h1>MZ Obfuscator</h1>
 
-<div class="box">
-<input type="file" id="fileInput" accept=".lua,.txt">
+  <div class="box">
+    <input id="fileInput" type="file" accept=".lua,.txt">
 
-<label><input type="checkbox" id="anti"> Anti-Tamper (loader protection)</label>
-<label><input type="checkbox" id="max"> Max Security (VM hardening)</label>
-<label><input type="checkbox" id="constp"> Constant Protection</label>
+    <div class="options">
+      <label><input type="checkbox" id="antiTamper" checked> Anti‑Tamper VM</label>
+      <label><input type="checkbox" id="maxSec" checked> Maximum Security</label>
+      <label><input type="checkbox" id="constProt" checked> Constant Protection</label>
+    </div>
 
-<button onclick="start()">Obfuscate</button>
+    <div class="sizeSlider">
+      <label>Obfuscation File Size: <span id="sizeVal">80</span> KB</label>
+      <input type="range" min="50" max="500" value="80" id="sizeRange">
+    </div>
 
-<div id="status"></div>
-<div class="progress"><div class="bar" id="bar"></div></div>
+    <button onclick="start()">Obfuscate</button>
 
-<textarea id="output" readonly></textarea>
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
 
-<div class="actions" id="actions">
-<button onclick="copyText()">COPY</button>
-<button onclick="download()">DOWNLOAD</button>
+    <textarea id="output" readonly></textarea>
+
+    <div class="actions" id="actions">
+      <button onclick="copyText()">COPY</button>
+      <button onclick="download()">DOWNLOAD</button>
+    </div>
+  </div>
 </div>
-</div>
-</div>
 
-<footer>© MZZ COMMUNITY</footer>
+<footer>© 2025 • MZZ COMMUNITY</footer>
 
 <script>
-/* Drawer */
-drawerBtn.onclick=()=>{drawer.classList.add("open");drawerBtn.style.display="none";}
-drawer.onclick=e=>{if(e.target===drawer){drawer.classList.remove("open");drawerBtn.style.display="flex";}}
+/* Drawer Logic */
+const btn = document.getElementById("drawerBtn");
+const drawer = document.getElementById("drawer");
+
+btn.onclick = () => {
+  drawer.classList.add("open");
+  btn.style.display = "none";
+};
+
+drawer.onclick = e => {
+  if (e.target === drawer) {
+    drawer.classList.remove("open");
+    btn.style.display = "flex";
+  }
+};
+
+/* Slider value */
+const sizeRange = document.getElementById("sizeRange");
+const sizeVal = document.getElementById("sizeVal");
+sizeRange.oninput = () => sizeVal.textContent = sizeRange.value;
 
 /* Obfuscator */
 function start(){
-  const f=fileInput.files[0];
-  if(!f)return alert("Select a file");
-  const r=new FileReader();
-  r.onload=()=>process(r.result);
+  const f = fileInput.files[0];
+  if(!f) return alert("Select a file");
+  const r = new FileReader();
+  r.onload = () => run(r.result);
   r.readAsText(f);
 }
 
-function process(code){
+function run(code){
   let p=0;
+  bar.style.width="0%";
   output.style.display="none";
   actions.style.display="none";
-  const t=setInterval(()=>{
-    p+=15;
+
+  const i=setInterval(()=>{
+    p+=2;
     bar.style.width=Math.min(p,100)+"%";
-    status.textContent="Obfuscating"+(".".repeat((p/15)%4));
     if(p>=100){
-      clearInterval(t);
-      output.value=obfuscate(code);
-      output.style.display="block";
-      actions.style.display="flex";
-      status.textContent="Completed";
+      clearInterval(i);
+      setTimeout(()=>{
+        output.value=obfuscate(code);
+        output.style.display="block";
+        actions.style.display="flex";
+      },300);
     }
-  },180);
+  },90);
+}
+
+function makePadding(size){
+  let arr=[];
+  for(let i=0;i<size*275;i++){
+    arr.push(Math.floor(Math.random()*255));
+  }
+  return arr.join(",");
 }
 
 function obfuscate(src){
-  const anti=anti.checked, maxs=max.checked, cst=constp.checked;
-  let key=Math.floor(Math.random()*200)+40;
-  let data=[...src].map(c=>c.charCodeAt(0)^key);
+  const key=Math.floor(Math.random()*200)+55;
+  const enc=[...src].map(c=>c.charCodeAt(0)^key);
+  const checksum=enc.reduce((a,b)=>a+b,0);
 
-  let loader=`local L=loadstring or load
-if not L then return end
-`;
+  const junkSize = antiTamper.checked ? parseInt(sizeRange.value) : 0;
+  const junkData = makePadding(junkSize);
 
-  if(anti){
-    loader+=`
-local H=0
-for i=1,#A do H=(H+A[i]*i)%999999937 end
-if H~=${data.length*key%999999937} then return end
-`;
-  }
+  let loader = `
+--([[This File Was Protected By MZ Obfuscator v0.0.5 | Anti-Deobfuscate]])
 
-  let vm=`
-local A={${data.join(",")}}
+local A={${enc.join(",")}}
 local K=${key}
-local S=""
-for i=1,#A do S=S..string.char(bit32.bxor(A[i],K)) end
+local C=${checksum}
+local J={${junkData}}
+local function _vt()
+  local s=0
+  for i=1,#J do s=(s+J[i])%999999 end
+  if s<0 then while true do end end
+end
+_vt()
+local function chk()
+  local s=0
+  for i=1,#A do s=s+A[i] end
+  if s~=C then while true do end end
+end
+chk()
+local function dec()
+  local o=""
+  for i=1,#A do
+    o=o..string.char(bit32.bxor(A[i],K))
+  end
+  return o
+end
 `;
 
-  if(cst){
-    vm=`local C=${key}*7\n`+vm;
-  }
+  loader += maxSec.checked
+    ? `
+local fn=(load or loadstring)(dec())
+if fn then fn() end
+`
+    : `(load or loadstring)(dec())()`;
 
-  return `--[[ Protected by MZ Obfuscator ]]
-${loader}
-${vm}
-(L or load)(S)()`;
+  return loader;
 }
 
 function copyText(){navigator.clipboard.writeText(output.value)}
 function download(){
-  const b=new Blob([output.value]);
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
+  a.href=URL.createObjectURL(new Blob([output.value]));
   a.download="obfuscated.lua";
   a.click();
 }
